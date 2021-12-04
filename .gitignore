@@ -4,6 +4,7 @@
 /storage/*.key
 /vendor
 .env
+.env.example
 .env.heroku
 .env.backup
 .phpunit.result.cache
