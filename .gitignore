@@ -3,6 +3,8 @@
 /public/storage
 /storage/*.key
 /vendor
+.env
+.env.heroku
 .env.backup
 .phpunit.result.cache
 docker-compose.override.yml
