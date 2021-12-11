@@ -20,7 +20,7 @@
    
     <table class="table table-bordered">
         <tr>
-            <th>No</th>
+            <th>Id</th>
             <th>Marca</th>
             <th>Modelo</th>
             <th>Ano</th>
@@ -29,7 +29,7 @@
         </tr>
         @foreach ($data as $key => $value)
         <tr>
-            <td>{{ ++$key }}</td>
+            <td>{{ $value->id }}</td>
             <td>{{ $value->marca }}</td>
             <td>{{ $value->modelo }}</td>
             <td>{{ $value->ano }}</td>

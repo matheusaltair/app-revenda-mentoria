@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\API\BaseController;
 use App\Http\Resources\ApiRevendaResource;
 use App\Models\Revenda;
 use Illuminate\Contracts\Validation\Validator as ValidationValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
-use Illuminate\Validation\Validator;
 
-class ApiRevendaController extends Controller
+class ApiRevendaController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -19,7 +19,7 @@ class ApiRevendaController extends Controller
     public function index()
     {
         $data = Revenda::all();
-        return ApiRevendaResource::collection($data);
+        return $this->sendResponse(ApiRevendaResource::collection($data), 'Todos os carros!');
     }
 
     /**
@@ -30,13 +30,18 @@ class ApiRevendaController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        //pegando os valores da api e criando um novo objeto
+        $input = $request->all();
+        $validator = FacadesValidator::make($input, [
             'marca' => 'required',
             'modelo' => 'required',
             'ano' => 'required|min:4|max:4',
-            'valor' => 'required',
+            'valor' => 'required|numeric|gte:10000', //grather than [gt] (maior que)
         ]);
-        //pegando os valores da api e criando um novo objeto
+        if($validator->fails()){
+            return $this->sendError($validator->errors());       
+        }
+
         $revenda = new Revenda();
         $revenda->marca = $request->input('marca');
         $revenda->modelo = $request->input('modelo');
@@ -45,7 +50,9 @@ class ApiRevendaController extends Controller
 
         //se o salvar deu certo ele retorna o objeto acima preenchido para a tela
         if($revenda->save()){
-            return new ApiRevendaResource($revenda);
+            return $this->sendResponse(new ApiRevendaResource($revenda), 'Carro inserido com sucesso!');
+        }else{
+            return $this->sendError("Não foi possível inserir o carro!");
         }
     }
 
@@ -57,8 +64,11 @@ class ApiRevendaController extends Controller
      */
     public function show($id)
     {
-        $data = Revenda::findOrFail($id); //buscar pelo id do registro
-        return new ApiRevendaResource($data);
+        $revenda = Revenda::find($id); //buscar pelo id do registro
+        if(is_null($revenda)){
+            return $this->sendError('o carro informado não foi encontrado!');       
+        }
+        return $this->sendResponse(new ApiRevendaResource($revenda), '');
     }
 
     /**
@@ -70,11 +80,27 @@ class ApiRevendaController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $input = $request->all();
+        $validator = FacadesValidator::make($input, [
+            'marca' => 'required',
+            'modelo' => 'required',
+            'ano' => 'required|min:4|max:4',
+            'valor' => 'required|numeric|gte:10000', //grather than [gt] (maior que)
+        ]);
+        if($validator->fails()){
+            return $this->sendError($validator->errors());       
+        }
+
         //verificando se tenho o ID (no banco de dados) que estou recebendo....
-        $revenda = Revenda::findOrFail($id); //buscar pelo id do registro
+        $revenda = Revenda::find($id); //buscar pelo id do registro
+        if(is_null($revenda)){
+            return $this->sendError('o carro informado não foi encontrado!');       
+        }
         //se o salvar deu certo ele retorna o objeto acima preenchido para a tela
         if($revenda->update($request->all())){
-            return new ApiRevendaResource($revenda);
+            return $this->sendResponse(new ApiRevendaResource($revenda), 'Carro atualizado com sucesso!');
+        }else{
+            return $this->sendError('Não foi possível atualizar o carro!');       
         }
     }
 
@@ -86,9 +112,15 @@ class ApiRevendaController extends Controller
      */
     public function destroy($id)
     {
-        $revenda = Revenda::findOrFail($id); //buscar pelo id do registro
+
+        $revenda = Revenda::find($id); //buscar pelo id do registro
+        if(is_null($revenda)){
+            return $this->sendError('o carro informado pra deletar não foi encontrado!');       
+        }
         if($revenda->delete()){
-            return new ApiRevendaResource($revenda);
+            return $this->sendResponse(new ApiRevendaResource($revenda), 'Carro deletado com sucesso!');
+        }else{
+            return $this->sendError('Não foi possível deletar o carro!');       
         }
     }
 }
