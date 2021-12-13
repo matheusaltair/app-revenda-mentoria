@@ -35,8 +35,18 @@ Use o Postman para a API.
     - GET http://localhost:8000/api/revenda/{iD}
 - Api cadastrar carro.
     - POST http://localhost:8000/api/revenda/
+    - Parametros:
+        - marca: string
+        - modelo: string
+        - ano: numeric: 4
+        - valor: numeric: >10000
 - Api atualizar o carro por id.
     - PUT http://localhost:8000/api/revenda/{iD}
+    - Parametros:
+        - marca: string
+        - modelo: string
+        - ano: numeric: 4
+        - valor: numeric: >10000
 - Api deletar carro por id.
     - DELETE http://localhost:8000/api/revenda/{iD}
     
